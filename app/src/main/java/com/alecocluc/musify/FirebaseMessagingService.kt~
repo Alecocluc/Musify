@@ -1,0 +1,63 @@
+package com.alecocluc.musify
+
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
+import android.util.Log
+import androidx.core.content.ContextCompat
+
+class MyFirebaseMessagingService : FirebaseMessagingService() {
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        // Maneja el mensaje recibido
+        Log.d("FCM", "Mensaje recibido: ${remoteMessage.data}")
+
+        // Mostrar la notificación
+        showNotification(remoteMessage)
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        // Maneja el nuevo token
+        Log.d("FCM", "Nuevo token: $token")
+        // Aquí puedes enviar el token a tu servidor si es necesario
+    }
+
+    private fun showNotification(remoteMessage: RemoteMessage) {
+        val channelId = "default_channel_id"
+        val channelName = "Default Channel"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(remoteMessage.notification?.title ?: "Título de Notificación")
+            .setContentText(remoteMessage.notification?.body ?: "Contenido de Notificación")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(this)) {
+            if (ContextCompat.checkSelfPermission(
+                    this@MyFirebaseMessagingService,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            notify(0, notificationBuilder.build())
+        }
+    }
+}

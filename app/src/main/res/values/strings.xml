@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Musify</string>
+    <string name="biblioteca">Biblioteca</string>
+    <string name="buscar">Buscar</string>
+    <string name="buscar_cancion">Buscar canción</string>
+    <string name="titulo_de_la_cancion">Título de la canción</string>
+    <string name="nombre_del_artista">Nombre del artista</string>
+    <string name="duracion">Duración</string>
+    <string name="idioma">Idioma</string>
+    <string name="portada_de_la_cancion">Portada de la canción</string>
+    <string name="favorito">Favorito</string>
+    <string name="reproducir_pausar">Reproducir/Pausar</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="regresar">Regresar</string>
+    <string name="oscuro">Oscuro</string>
+    <string name="claro">Claro</string>
+    <string name="configuracion">Configuración</string>
+    <string name="predeterminado">Predeterminado</string>
+    <string name="creditos">Hecho por Álex Coca Lucena 2ºDAM - Deezer API</string>
+    <string name="tema">Tema</string>
+    <string name="borrar_canciones">Borrar todas las canciones</string>
+    <string name="restablecer_ajustes">Restablecer ajustes predeterminados</string>
+    <string name="albumes_populares">Álbumes Populares</string>
+    <string name="artistas_populares">Artistas Populares</string>
+    <string name="canciones_populares">Canciones Populares</string>
+    <string name="inicio">Inicio</string>
+    <string name="song_duration">%d segundos</string>
+</resources>
