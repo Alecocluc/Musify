@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp") version "2.0.21-1.0.28"
+    id("com.google.devtools.ksp") version "2.0.21-1.0.28" // Última versión de KSP
 }
 
 android {
@@ -53,7 +53,7 @@ dependencies {
     // Dependencias Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
+    ksp(libs.androidx.room.compiler)
 
     // Otras dependencias necesarias
     implementation(libs.androidx.recyclerview)
