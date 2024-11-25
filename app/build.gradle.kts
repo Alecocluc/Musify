@@ -40,7 +40,6 @@ android {
 }
 
 dependencies {
-    // Dependencias base
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -50,12 +49,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Dependencias Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Otras dependencias necesarias
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
     implementation(libs.volley)
