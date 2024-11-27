@@ -3,11 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginTop="4dp"
     android:background="@drawable/card_background"
-    android:elevation="4dp"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,14 +35,14 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_play"
                 app:tint="@color/colorOnPrimary" />
-
         </FrameLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/songTitleTextView"
@@ -58,13 +57,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nombre_del_artista"
-                android:textColor="@color/colorOnPrimary" />
-
-            <TextView
-                android:id="@+id/durationTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/duracion"
                 android:textColor="@color/colorOnPrimary" />
         </LinearLayout>
 

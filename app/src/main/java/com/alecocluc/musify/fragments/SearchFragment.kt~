@@ -48,7 +48,7 @@ class SearchFragment : Fragment() {
         songAdapter = SongAdapter(
             emptyList(),
             { song -> addToFavorites(song) },
-            { song -> removeFromFavorites(song) },
+            { song -> removeFromFavorites(song) }
             useSearchLayout = true
         )
         binding.recyclerView.adapter = songAdapter

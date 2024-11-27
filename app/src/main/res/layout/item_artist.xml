@@ -11,7 +11,7 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:scaleType="centerCrop"
-        android:background="@drawable/circle_placeholder" />
+        android:background="@drawable/square_placeholder" />
 
     <TextView
         android:id="@+id/artistNameTextView"
