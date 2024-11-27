@@ -71,6 +71,17 @@ class SongAdapter(
         }
     }
 
+    // Eliminar una canción de la lista de favoritos
+    fun removeSongFromFavorites(songId: Long) {
+        val songIndex = songs.indexOfFirst { it.id == songId }
+        if (songIndex != -1) {
+            val updatedSongs = songs.toMutableList().apply {
+                removeAt(songIndex)
+            }
+            updateSongs(updatedSongs)
+        }
+    }
+
     inner class SongViewHolder(private val binding: Any, private val context: Context) :
         RecyclerView.ViewHolder((binding as? ItemSongBinding ?: binding as ItemSongSearchBinding).root) {
 
@@ -96,7 +107,7 @@ class SongAdapter(
             Picasso.get().load(song.coverUrl).into(binding.coverImageView)
 
             // Configura el icono de favorito
-            if (showSavedIcon) {
+            if (showSavedIcon || song.isFavorite) {
                 binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
             } else {
                 setupFavoriteIcon(binding.favoriteImageView, song)
@@ -120,11 +131,15 @@ class SongAdapter(
             if (song.isFavorite) {
                 imageView.setImageResource(R.drawable.ic_star_saved)
                 imageView.setOnClickListener {
+                    // Eliminar de favoritos
                     onRemoveFavoriteClick?.invoke(song)
+                    // Actualizar la vista para eliminar la canción de la lista
+                    removeSongFromFavorites(song.id)
                 }
             } else {
                 imageView.setImageResource(R.drawable.ic_star)
                 imageView.setOnClickListener {
+                    // Agregar a favoritos
                     onFavoriteClick(song)
                 }
             }
