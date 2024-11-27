@@ -92,6 +92,7 @@ class SongAdapter(
         private fun bindLibraryLayout(binding: ItemSongBinding, song: Song) {
             binding.songTitleTextView.text = song.title
             binding.artistNameTextView.text = song.artist
+            binding.durationTextView.text = context.getString(R.string.song_duration, song.duration)
             Picasso.get().load(song.coverUrl).into(binding.coverImageView)
 
             // Configura el icono de favorito

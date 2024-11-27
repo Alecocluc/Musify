@@ -18,7 +18,7 @@ class SongAdapter(
     private val onFavoriteClick: (Song) -> Unit,
     private val onRemoveFavoriteClick: ((Song) -> Unit)? = null,
     private val showSavedIcon: Boolean = false,
-    private val useSearchLayout: Boolean = false // Nuevo parámetro para elegir el layout
+    private val useSearchLayout: Boolean = false // Usar layout de búsqueda o biblioteca
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
 
     private var mediaPlayer: MediaPlayer? = null
@@ -77,9 +77,6 @@ class SongAdapter(
         private val updateProgress = object : Runnable {
             override fun run() {
                 mediaPlayer?.let {
-                    if (binding is ItemSongBinding) {
-                        binding.progressBar.progress = it.currentPosition / 1000
-                    }
                     handler.postDelayed(this, 1000)
                 }
             }
@@ -95,21 +92,10 @@ class SongAdapter(
         private fun bindLibraryLayout(binding: ItemSongBinding, song: Song) {
             binding.songTitleTextView.text = song.title
             binding.artistNameTextView.text = song.artist
-            binding.durationTextView.text = context.getString(R.string.song_duration, song.duration)
             Picasso.get().load(song.coverUrl).into(binding.coverImageView)
 
             // Configura el icono de favorito
-            if (showSavedIcon || song.isFavorite) {
-                binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
-                binding.favoriteImageView.setOnClickListener {
-                    onRemoveFavoriteClick?.invoke(song)
-                }
-            } else {
-                binding.favoriteImageView.setImageResource(R.drawable.ic_star)
-                binding.favoriteImageView.setOnClickListener {
-                    onFavoriteClick(song)
-                }
-            }
+            setupFavoriteIcon(binding.favoriteImageView, song)
 
             setupPlayPauseButton(binding, song)
         }
@@ -119,66 +105,70 @@ class SongAdapter(
             binding.artistNameTextView.text = song.artist
             Picasso.get().load(song.coverUrl).into(binding.coverImageView)
 
-            // Configura el icono de favorito para el layout de búsqueda
+            // Configura el icono de favorito
+            setupFavoriteIcon(binding.favoriteImageView, song)
+
+            setupPlayPauseButton(binding, song)
+        }
+
+        private fun setupFavoriteIcon(imageView: android.widget.ImageView, song: Song) {
             if (song.isFavorite) {
-                binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
-                binding.favoriteImageView.setOnClickListener {
+                imageView.setImageResource(R.drawable.ic_star_saved)
+                imageView.setOnClickListener {
                     onRemoveFavoriteClick?.invoke(song)
                 }
             } else {
-                binding.favoriteImageView.setImageResource(R.drawable.ic_star)
-                binding.favoriteImageView.setOnClickListener {
+                imageView.setImageResource(R.drawable.ic_star)
+                imageView.setOnClickListener {
                     onFavoriteClick(song)
                 }
             }
         }
 
-        private fun setupPlayPauseButton(binding: ItemSongBinding, song: Song) {
-            if (bindingAdapterPosition == currentPlayingPosition) {
-                binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
-                handler.post(updateProgress)
-            } else {
-                binding.playPauseImageView.setImageResource(R.drawable.ic_play)
-                binding.progressBar.progress = 0
-                handler.removeCallbacks(updateProgress)
+        private fun setupPlayPauseButton(binding: Any, song: Song) {
+            val playPauseImageView = when (binding) {
+                is ItemSongBinding -> binding.playPauseImageView
+                is ItemSongSearchBinding -> binding.playPauseImageView
+                else -> return
             }
 
-            binding.playPauseImageView.setOnClickListener {
+            playPauseImageView.setImageResource(
+                if (bindingAdapterPosition == currentPlayingPosition) R.drawable.ic_pause else R.drawable.ic_play
+            )
+
+            playPauseImageView.setOnClickListener {
                 if (bindingAdapterPosition == currentPlayingPosition) {
-                    toggleMediaPlayer(binding)
+                    toggleMediaPlayer(playPauseImageView)
                 } else {
                     clearPreviousSongState()
-                    playNewSong(binding, song)
+                    playNewSong(song, playPauseImageView)
                 }
             }
         }
 
-        private fun toggleMediaPlayer(binding: ItemSongBinding) {
+        private fun toggleMediaPlayer(playPauseImageView: android.widget.ImageView) {
             mediaPlayer?.let {
                 if (it.isPlaying) {
                     it.pause()
-                    binding.playPauseImageView.setImageResource(R.drawable.ic_play)
+                    playPauseImageView.setImageResource(R.drawable.ic_play)
                 } else {
                     it.start()
-                    binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
+                    playPauseImageView.setImageResource(R.drawable.ic_pause)
                     handler.post(updateProgress)
                 }
             }
         }
 
-        private fun playNewSong(binding: ItemSongBinding, song: Song) {
+        private fun playNewSong(song: Song, playPauseImageView: android.widget.ImageView) {
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(song.previewUrl)
                 setOnPreparedListener {
                     start()
-                    binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
-                    binding.progressBar.max = duration / 1000
-                    binding.progressBar.progress = 0
+                    playPauseImageView.setImageResource(R.drawable.ic_pause)
                     handler.post(updateProgress)
                 }
                 setOnCompletionListener {
-                    binding.playPauseImageView.setImageResource(R.drawable.ic_play)
-                    binding.progressBar.progress = 0
+                    playPauseImageView.setImageResource(R.drawable.ic_play)
                     handler.removeCallbacks(updateProgress)
                 }
                 prepareAsync()
