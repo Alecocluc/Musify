@@ -96,7 +96,11 @@ class SongAdapter(
             Picasso.get().load(song.coverUrl).into(binding.coverImageView)
 
             // Configura el icono de favorito
-            setupFavoriteIcon(binding.favoriteImageView, song)
+            if (showSavedIcon) {
+                binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
+            } else {
+                setupFavoriteIcon(binding.favoriteImageView, song)
+            }
 
             setupPlayPauseButton(binding, song)
         }
@@ -116,11 +120,13 @@ class SongAdapter(
             if (song.isFavorite) {
                 imageView.setImageResource(R.drawable.ic_star_saved)
                 imageView.setOnClickListener {
+                    // Eliminar de favoritos
                     onRemoveFavoriteClick?.invoke(song)
                 }
             } else {
                 imageView.setImageResource(R.drawable.ic_star)
                 imageView.setOnClickListener {
+                    // Agregar a favoritos
                     onFavoriteClick(song)
                 }
             }
