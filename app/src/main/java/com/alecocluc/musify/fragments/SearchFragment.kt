@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alecocluc.musify.SettingsActivity
-import com.alecocluc.musify.adapters.SongAdapter
+import com.alecocluc.musify.adapters.SongAdapterSearch
 import com.alecocluc.musify.database.SongDao
 import com.alecocluc.musify.database.SongDatabase
 import com.alecocluc.musify.database.SongEntity
@@ -31,7 +31,7 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var requestQueue: RequestQueue
-    private lateinit var songAdapter: SongAdapter
+    private lateinit var songAdapterSearch: SongAdapterSearch
     private lateinit var songDao: SongDao
 
     override fun onCreateView(
@@ -45,12 +45,15 @@ class SearchFragment : Fragment() {
         songDao = SongDatabase.getDatabase(requireContext()).songDao()
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        songAdapter = SongAdapter(
+
+        // Inicialización del SongAdapterSearch
+        songAdapterSearch = SongAdapterSearch(
             emptyList(),
             { song -> addToFavorites(song) },
-            { song -> removeFromFavorites(song) },
+            { song -> removeFromFavorites(song) }
         )
-        binding.recyclerView.adapter = songAdapter
+
+        binding.recyclerView.adapter = songAdapterSearch
 
         binding.searchButton.setOnClickListener {
             val query = binding.searchEditText.text.toString()
@@ -88,7 +91,7 @@ class SearchFragment : Fragment() {
                             songs.add(song)
                         }
                         withContext(Dispatchers.Main) {
-                            songAdapter.updateSongs(songs)
+                            songAdapterSearch.updateSongs(songs)
                         }
                     }
                 } catch (e: JSONException) {
@@ -115,7 +118,7 @@ class SearchFragment : Fragment() {
         )
 
         CoroutineScope(Dispatchers.Main).launch {
-            songAdapter.updateFavoriteStatus(song.id, true)
+            songAdapterSearch.updateFavoriteStatus(song.id, true)
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -127,7 +130,7 @@ class SearchFragment : Fragment() {
 
     private fun removeFromFavorites(song: Song) {
         CoroutineScope(Dispatchers.Main).launch {
-            songAdapter.updateFavoriteStatus(song.id, false)
+            songAdapterSearch.updateFavoriteStatus(song.id, false)
         }
 
         CoroutineScope(Dispatchers.IO).launch {

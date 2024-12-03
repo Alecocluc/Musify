@@ -13,12 +13,18 @@ import com.alecocluc.musify.databinding.ItemSongSearchBinding
 import com.alecocluc.musify.models.Song
 import com.squareup.picasso.Picasso
 
+// Enum para distinguir los tipos de vista
+enum class ViewType {
+    SEARCH,
+    LIBRARY
+}
+
 class SongAdapter(
     var songs: List<Song>,
+    private val viewType: ViewType,  // Parámetro para distinguir los fragmentos
     private val onFavoriteClick: (Song) -> Unit,
     private val onRemoveFavoriteClick: ((Song) -> Unit)? = null,
-    private val showSavedIcon: Boolean = false,
-    private val useSearchLayout: Boolean = false // Usar layout de búsqueda o biblioteca
+    private val showSavedIcon: Boolean = false
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
 
     private var mediaPlayer: MediaPlayer? = null
@@ -37,12 +43,17 @@ class SongAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return if (useSearchLayout) {
-            val binding = ItemSongSearchBinding.inflate(inflater, parent, false)
-            SongViewHolder(binding, parent.context)
-        } else {
-            val binding = ItemSongBinding.inflate(inflater, parent, false)
-            SongViewHolder(binding, parent.context)
+
+        // Inflar el layout correcto según el tipo de vista proporcionado
+        return when (this.viewType) {
+            ViewType.SEARCH -> {
+                val binding = ItemSongSearchBinding.inflate(inflater, parent, false)
+                SongViewHolder.SearchViewHolder(binding, parent.context)
+            }
+            ViewType.LIBRARY -> {
+                val binding = ItemSongBinding.inflate(inflater, parent, false)
+                SongViewHolder.LibraryViewHolder(binding, parent.context)
+            }
         }
     }
 
@@ -71,129 +82,152 @@ class SongAdapter(
         }
     }
 
-    // Eliminar una canción de la lista de favoritos
-    fun removeSongFromFavorites(songId: Long) {
-        val songIndex = songs.indexOfFirst { it.id == songId }
-        if (songIndex != -1) {
-            val updatedSongs = songs.toMutableList().apply {
-                removeAt(songIndex)
-            }
-            updateSongs(updatedSongs)
-        }
+    // Elimina una canción de la lista
+    fun removeSong(songId: Long) {
+        songs = songs.filterNot { it.id == songId }
+        notifyDataSetChanged()
     }
 
-    inner class SongViewHolder(private val binding: Any, private val context: Context) :
-        RecyclerView.ViewHolder((binding as? ItemSongBinding ?: binding as ItemSongSearchBinding).root) {
+    sealed class SongViewHolder(binding: Any, protected val context: Context) : RecyclerView.ViewHolder(
+        (binding as? ItemSongBinding)?.root ?: (binding as ItemSongSearchBinding).root
+    ) {
 
-        private val updateProgress = object : Runnable {
-            override fun run() {
-                mediaPlayer?.let {
-                    handler.postDelayed(this, 1000)
+        abstract fun bind(song: Song)
+
+        class LibraryViewHolder(
+            private val binding: ItemSongBinding,
+            context: Context
+        ) : SongViewHolder(binding, context) {
+
+            private val handler = Handler(Looper.getMainLooper())
+            private var mediaPlayer: MediaPlayer? = null
+
+            private val updateProgress = object : Runnable {
+                override fun run() {
+                    mediaPlayer?.let {
+                        binding.progressBar.progress = it.currentPosition / 1000
+                        handler.postDelayed(this, 1000)
+                    }
                 }
             }
-        }
 
-        fun bind(song: Song) {
-            when (binding) {
-                is ItemSongBinding -> bindLibraryLayout(binding, song)
-                is ItemSongSearchBinding -> bindSearchLayout(binding, song)
-            }
-        }
+            override fun bind(song: Song) {
+                binding.songTitleTextView.text = song.title
+                binding.artistNameTextView.text = song.artist
+                binding.durationTextView.text = context.getString(R.string.song_duration, song.duration)
+                Picasso.get().load(song.coverUrl).into(binding.coverImageView)
 
-        private fun bindLibraryLayout(binding: ItemSongBinding, song: Song) {
-            binding.songTitleTextView.text = song.title
-            binding.artistNameTextView.text = song.artist
-            binding.durationTextView.text = context.getString(R.string.song_duration, song.duration)
-            Picasso.get().load(song.coverUrl).into(binding.coverImageView)
-
-            // Configura el icono de favorito
-            if (showSavedIcon || song.isFavorite) {
-                binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
-            } else {
-                setupFavoriteIcon(binding.favoriteImageView, song)
-            }
-
-            setupPlayPauseButton(binding, song)
-        }
-
-        private fun bindSearchLayout(binding: ItemSongSearchBinding, song: Song) {
-            binding.songTitleTextView.text = song.title
-            binding.artistNameTextView.text = song.artist
-            Picasso.get().load(song.coverUrl).into(binding.coverImageView)
-
-            // Configura el icono de favorito
-            setupFavoriteIcon(binding.favoriteImageView, song)
-
-            setupPlayPauseButton(binding, song)
-        }
-
-        private fun setupFavoriteIcon(imageView: android.widget.ImageView, song: Song) {
-            if (song.isFavorite) {
-                imageView.setImageResource(R.drawable.ic_star_saved)
-                imageView.setOnClickListener {
-                    // Eliminar de favoritos
-                    onRemoveFavoriteClick?.invoke(song)
-                    // Actualizar la vista para eliminar la canción de la lista
-                    removeSongFromFavorites(song.id)
-                }
-            } else {
-                imageView.setImageResource(R.drawable.ic_star)
-                imageView.setOnClickListener {
-                    // Agregar a favoritos
-                    onFavoriteClick(song)
-                }
-            }
-        }
-
-        private fun setupPlayPauseButton(binding: Any, song: Song) {
-            val playPauseImageView = when (binding) {
-                is ItemSongBinding -> binding.playPauseImageView
-                is ItemSongSearchBinding -> binding.playPauseImageView
-                else -> return
-            }
-
-            playPauseImageView.setImageResource(
-                if (bindingAdapterPosition == currentPlayingPosition) R.drawable.ic_pause else R.drawable.ic_play
-            )
-
-            playPauseImageView.setOnClickListener {
-                if (bindingAdapterPosition == currentPlayingPosition) {
-                    toggleMediaPlayer(playPauseImageView)
+                // Configuración de favoritos
+                if (song.isFavorite) {
+                    binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
+                    binding.favoriteImageView.setOnClickListener { (bindingAdapter as SongAdapter).onRemoveFavoriteClick?.invoke(song) }
                 } else {
-                    clearPreviousSongState()
-                    playNewSong(song, playPauseImageView)
+                    binding.favoriteImageView.setImageResource(R.drawable.ic_star)
+                    binding.favoriteImageView.setOnClickListener { (bindingAdapter as SongAdapter).onFavoriteClick(song) }
+                }
+
+                // Configuración de reproducción
+                binding.playPauseImageView.setOnClickListener {
+                    if (bindingAdapterPosition == (bindingAdapter as SongAdapter).currentPlayingPosition) {
+                        // Si la canción ya está en reproducción
+                        if (mediaPlayer?.isPlaying == true) {
+                            mediaPlayer?.pause()
+                            binding.playPauseImageView.setImageResource(R.drawable.ic_play)
+                        } else {
+                            mediaPlayer?.start()
+                            binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
+                            handler.post(updateProgress)
+                        }
+                    } else {
+                        (bindingAdapter as SongAdapter).clearPreviousSongState()
+                        mediaPlayer = MediaPlayer().apply {
+                            setDataSource(song.previewUrl)
+                            prepareAsync()
+                            setOnPreparedListener {
+                                start()
+                                binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
+                                binding.progressBar.max = duration / 1000
+                                binding.progressBar.progress = 0
+                                handler.post(updateProgress)
+                            }
+                            setOnCompletionListener {
+                                binding.playPauseImageView.setImageResource(R.drawable.ic_play)
+                                binding.progressBar.progress = 0
+                                handler.removeCallbacks(updateProgress)
+                                mediaPlayer?.release()
+                                mediaPlayer = null
+                            }
+                        }
+                        (bindingAdapter as SongAdapter).currentPlayingPosition = bindingAdapterPosition
+                    }
                 }
             }
         }
 
-        private fun toggleMediaPlayer(playPauseImageView: android.widget.ImageView) {
-            mediaPlayer?.let {
-                if (it.isPlaying) {
-                    it.pause()
-                    playPauseImageView.setImageResource(R.drawable.ic_play)
+        class SearchViewHolder(
+            private val binding: ItemSongSearchBinding,
+            context: Context
+        ) : SongViewHolder(binding, context) {
+
+            private val handler = Handler(Looper.getMainLooper())
+            private var mediaPlayer: MediaPlayer? = null
+
+            private val updateProgress = object : Runnable {
+                override fun run() {
+                    mediaPlayer?.let {
+                        // Update the progress bar with the current position
+                        handler.postDelayed(this, 1000)
+                    }
+                }
+            }
+
+            override fun bind(song: Song) {
+                binding.songTitleTextView.text = song.title
+                binding.artistNameTextView.text = song.artist
+                Picasso.get().load(song.coverUrl).into(binding.coverImageView)
+
+                // Configuración de favoritos
+                if (song.isFavorite) {
+                    binding.favoriteImageView.setImageResource(R.drawable.ic_star_saved)
+                    binding.favoriteImageView.setOnClickListener { (bindingAdapter as SongAdapter).onRemoveFavoriteClick?.invoke(song) }
                 } else {
-                    it.start()
-                    playPauseImageView.setImageResource(R.drawable.ic_pause)
-                    handler.post(updateProgress)
+                    binding.favoriteImageView.setImageResource(R.drawable.ic_star)
+                    binding.favoriteImageView.setOnClickListener { (bindingAdapter as SongAdapter).onFavoriteClick(song) }
                 }
-            }
-        }
 
-        private fun playNewSong(song: Song, playPauseImageView: android.widget.ImageView) {
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(song.previewUrl)
-                setOnPreparedListener {
-                    start()
-                    playPauseImageView.setImageResource(R.drawable.ic_pause)
-                    handler.post(updateProgress)
+                // Configuración de reproducción
+                binding.playPauseImageView.setOnClickListener {
+                    if (bindingAdapterPosition == (bindingAdapter as SongAdapter).currentPlayingPosition) {
+                        // Si la canción ya está en reproducción
+                        if (mediaPlayer?.isPlaying == true) {
+                            mediaPlayer?.pause()
+                            binding.playPauseImageView.setImageResource(R.drawable.ic_play)
+                        } else {
+                            mediaPlayer?.start()
+                            binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
+                            handler.post(updateProgress)
+                        }
+                    } else {
+                        (bindingAdapter as SongAdapter).clearPreviousSongState()
+                        mediaPlayer = MediaPlayer().apply {
+                            setDataSource(song.previewUrl)
+                            prepareAsync()
+                            setOnPreparedListener {
+                                start()
+                                binding.playPauseImageView.setImageResource(R.drawable.ic_pause)
+                                handler.post(updateProgress)
+                            }
+                            setOnCompletionListener {
+                                binding.playPauseImageView.setImageResource(R.drawable.ic_play)
+                                handler.removeCallbacks(updateProgress)
+                                mediaPlayer?.release()
+                                mediaPlayer = null
+                            }
+                        }
+                        (bindingAdapter as SongAdapter).currentPlayingPosition = bindingAdapterPosition
+                    }
                 }
-                setOnCompletionListener {
-                    playPauseImageView.setImageResource(R.drawable.ic_play)
-                    handler.removeCallbacks(updateProgress)
-                }
-                prepareAsync()
             }
-            currentPlayingPosition = bindingAdapterPosition
         }
     }
 }
