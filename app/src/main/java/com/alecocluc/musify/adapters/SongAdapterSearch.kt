@@ -1,6 +1,5 @@
 package com.alecocluc.musify.adapters
 
-import android.content.Context
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
@@ -33,7 +32,7 @@ class SongAdapterSearch(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val binding = ItemSongSearchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SongViewHolder(binding, parent.context)
+        return SongViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
@@ -60,8 +59,7 @@ class SongAdapterSearch(
     }
 
     inner class SongViewHolder(
-        private val binding: ItemSongSearchBinding,
-        private val context: Context
+        private val binding: ItemSongSearchBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val updateProgress = object : Runnable {
