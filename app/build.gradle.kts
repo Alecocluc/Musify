@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
     id("com.google.devtools.ksp") version "2.0.21-1.0.28"
 }
 
@@ -57,4 +58,9 @@ dependencies {
     implementation(libs.picasso)
     implementation(libs.volley)
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.google.firebase.analytics)
+    implementation(libs.firebase.messaging)
 }
+
+apply(plugin = "com.google.gms.google-services")
