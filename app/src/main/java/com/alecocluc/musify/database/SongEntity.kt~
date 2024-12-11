@@ -10,6 +10,5 @@ data class SongEntity(
     val artist: String,
     val duration: Int,
     val coverUrl: String,
-    val previewUrl: String,
-    val savedAt: Long
+    val previewUrl: String
 )

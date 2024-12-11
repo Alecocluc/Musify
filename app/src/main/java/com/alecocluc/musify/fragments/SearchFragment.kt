@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
+import java.util.*
 
 class SearchFragment : Fragment() {
 
@@ -114,7 +115,8 @@ class SearchFragment : Fragment() {
             artist = song.artist,
             duration = song.duration,
             coverUrl = song.coverUrl,
-            previewUrl = song.previewUrl
+            previewUrl = song.previewUrl,
+            savedAt = System.currentTimeMillis()
         )
 
         CoroutineScope(Dispatchers.Main).launch {

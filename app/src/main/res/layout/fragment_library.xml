@@ -34,6 +34,19 @@
             android:scaleType="centerInside"
             android:src="@drawable/ic_settings"
             app:tint="@color/colorOnPrimary" />
+
+        <!-- Añadir el botón de filtro -->
+        <ImageButton
+            android:id="@+id/filterButtonLibrary"
+            android:layout_width="32dp"
+            android:layout_height="48dp"
+            android:layout_toStartOf="@id/settingsButtonLibrary"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="Filtrar"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_filter"
+            app:tint="@color/colorOnPrimary" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

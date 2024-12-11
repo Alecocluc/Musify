@@ -22,5 +22,5 @@ interface SongDao {
     suspend fun deleteAllSongs()
 
     @Query("SELECT * FROM songs WHERE savedAt BETWEEN :startDate AND :endDate ORDER BY savedAt DESC")
-    fun getSongsByDateRange(startDate: Long, endDate: Long): List<SongEntity>
+    fun getSongsByDateRange(startDate: Long, endDate: Long): List<Song>
 }

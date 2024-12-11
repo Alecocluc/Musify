@@ -7,5 +7,6 @@ data class Song(
     val duration: Int,
     val coverUrl: String,
     val previewUrl: String,
-    var isFavorite: Boolean = false
+    var isFavorite: Boolean = false,
+    val savedAt: Long = System.currentTimeMillis()
 )

@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
+import java.util.*
 
 class SearchFragment : Fragment() {
 
@@ -85,7 +86,7 @@ class SearchFragment : Fragment() {
                                 artist = songObject.getJSONObject("artist").getString("name"),
                                 duration = songObject.getInt("duration"),
                                 coverUrl = songObject.getJSONObject("album").getString("cover_big"),
-                                previewUrl = songObject.getString("preview"),
+                                previewUrl = songObject.getString("preview"), // Extract preview URL
                                 isFavorite = songObject.getLong("id") in favoriteSongsIds
                             )
                             songs.add(song)
@@ -100,12 +101,12 @@ class SearchFragment : Fragment() {
             },
             { error ->
                 error.printStackTrace()
-                Toast.makeText(requireContext(), "Error al buscar canciones", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error al buscar canciones", Toast.LENGTH_SHORT)
+                    .show()
             })
 
         requestQueue.add(request)
     }
-
 
     private fun addToFavorites(song: Song) {
         val songEntity = SongEntity(
@@ -114,7 +115,8 @@ class SearchFragment : Fragment() {
             artist = song.artist,
             duration = song.duration,
             coverUrl = song.coverUrl,
-            previewUrl = song.previewUrl
+            previewUrl = song.previewUrl,
+            savedAt = System.currentTimeMillis() // Establecer la fecha y hora actual
         )
 
         CoroutineScope(Dispatchers.Main).launch {

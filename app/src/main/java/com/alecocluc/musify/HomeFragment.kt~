@@ -136,7 +136,8 @@ class HomeFragment : Fragment() {
                 duration = songObject.getInt("duration"),
                 coverUrl = songObject.getJSONObject("album").getString("cover_big"),
                 previewUrl = songObject.getString("preview"),
-                isFavorite = false
+                isFavorite = false,
+                savedAt = 0
             )
             songs.add(song)
         }
