@@ -19,6 +19,7 @@ import com.alecocluc.musify.models.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.alecocluc.musify.R
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -59,7 +60,7 @@ class LibraryFragment : Fragment() {
         }
 
         binding.filterButtonLibrary.setOnClickListener {
-            showDateTimePicker()
+            toggleFilterMenu(inflater)
         }
 
         return view
@@ -84,47 +85,81 @@ class LibraryFragment : Fragment() {
         }
     }
 
-    private fun showDateTimePicker() {
-        val calendar = Calendar.getInstance()
+    private fun toggleFilterMenu(inflater: LayoutInflater) {
+        if (binding.filterMenuContainer.visibility == View.GONE) {
+            val filterMenuView = inflater.inflate(
+                R.layout.filter_menu,
+                binding.filterMenuContainer,
+                false
+            )
 
-        // DatePicker para la fecha de inicio
-        DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-            startDateTime = Calendar.getInstance().apply {
-                set(year, month, dayOfMonth)
-            }
-
-            // TimePicker para la hora de inicio
-            TimePickerDialog(requireContext(), { _, hourOfDay, minute ->
-                startDateTime?.apply {
-                    set(Calendar.HOUR_OF_DAY, hourOfDay)
-                    set(Calendar.MINUTE, minute)
-                    set(Calendar.SECOND, 0)
+            filterMenuView.findViewById<View>(R.id.startDatePickerButton)
+                .setOnClickListener {
+                    showDateTimePicker { calendar ->
+                        startDateTime = calendar
+                    }
                 }
 
-                // DatePicker para la fecha de fin
-                DatePickerDialog(requireContext(), { _, endYear, endMonth, endDayOfMonth ->
-                    endDateTime = Calendar.getInstance().apply {
-                        set(endYear, endMonth, endDayOfMonth)
+            filterMenuView.findViewById<View>(R.id.endDatePickerButton)
+                .setOnClickListener {
+                    showDateTimePicker { calendar ->
+                        endDateTime = calendar
                     }
+                }
 
-                    // TimePicker para la hora de fin
-                    TimePickerDialog(requireContext(), { _, endHourOfDay, endMinute ->
-                        endDateTime?.apply {
-                            set(Calendar.HOUR_OF_DAY, endHourOfDay)
-                            set(Calendar.MINUTE, endMinute)
-                            set(Calendar.SECOND, 59) // Al final del segundo
+            filterMenuView.findViewById<View>(R.id.applyFilterButton)
+                .setOnClickListener {
+                    filterSongsByDateRange()
+                    toggleFilterMenu(inflater)
+                }
+
+            filterMenuView.findViewById<View>(R.id.clearFilterButton)
+                .setOnClickListener {
+                    startDateTime = null
+                    endDateTime = null
+                    loadSavedSongs()
+                    toggleFilterMenu(inflater)
+                }
+
+            binding.filterMenuContainer.addView(filterMenuView)
+            binding.filterMenuContainer.visibility = View.VISIBLE
+        } else {
+            binding.filterMenuContainer.removeAllViews()
+            binding.filterMenuContainer.visibility = View.GONE
+        }
+    }
+
+    private fun showDateTimePicker(onDateTimeSelected: (Calendar) -> Unit) {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                TimePickerDialog(
+                    requireContext(),
+                    { _, hour, minute ->
+                        val selectedDateTime = Calendar.getInstance().apply {
+                            set(year, month, dayOfMonth, hour, minute, 0)
                         }
-                        filterSongsByDateRange()
-                    }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
-                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
-
-            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+                        onDateTimeSelected(selectedDateTime)
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                ).show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
     private fun filterSongsByDateRange() {
         if (startDateTime == null || endDateTime == null) {
-            Toast.makeText(requireContext(), "Por favor selecciona ambos intervalos de fecha y hora", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Por favor selecciona ambos intervalos de fecha y hora",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -146,7 +181,11 @@ class LibraryFragment : Fragment() {
 
             withContext(Dispatchers.Main) {
                 if (songsByDateRange.isEmpty()) {
-                    Toast.makeText(requireContext(), "No se encontraron canciones en el rango seleccionado", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "No se encontraron canciones en el rango seleccionado",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 songAdapter.updateSongs(songsByDateRange)
             }

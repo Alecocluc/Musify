@@ -26,4 +26,11 @@
     <string name="canciones_populares">Canciones Populares</string>
     <string name="inicio">Inicio</string>
     <string name="song_duration">%d segundos</string>
+    <string name="filtrar">Filtrar</string>
+    <string name="fecha_inicio">Fecha de Inicio</string>
+    <string name="seleccionar_fecha_inicio">Seleccionar fecha de inicio</string>
+    <string name="fecha_fin">Fecha de Fin</string>
+    <string name="seleccionar_fecha_fin">Seleccionar fecha fin</string>
+    <string name="aplicar">Aplicar</string>
+    <string name="borrar_filtro">Borrar Filtro</string>
 </resources>
