@@ -14,12 +14,12 @@ import com.alecocluc.musify.SettingsActivity
 import com.alecocluc.musify.adapters.SongAdapter
 import com.alecocluc.musify.database.SongDao
 import com.alecocluc.musify.database.SongDatabase
+import com.alecocluc.musify.R
 import com.alecocluc.musify.databinding.FragmentLibraryBinding
 import com.alecocluc.musify.models.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.alecocluc.musify.R
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -37,12 +37,21 @@ class LibraryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        binding.savedSongsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        setupRecyclerView()
+        setupListeners()
 
+        songDao = SongDatabase.getDatabase(requireContext()).songDao()
+        loadSavedSongs()
+
+        return view
+    }
+
+    private fun setupRecyclerView() {
+        binding.savedSongsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         songAdapter = SongAdapter(
             emptyList(),
             onFavoriteClick = { },
@@ -50,20 +59,17 @@ class LibraryFragment : Fragment() {
             showSavedIcon = true
         )
         binding.savedSongsRecyclerView.adapter = songAdapter
+    }
 
-        songDao = SongDatabase.getDatabase(requireContext()).songDao()
-        loadSavedSongs()
-
+    private fun setupListeners() {
         binding.settingsButtonLibrary.setOnClickListener {
             val intent = Intent(requireContext(), SettingsActivity::class.java)
             startActivity(intent)
         }
 
         binding.filterButtonLibrary.setOnClickListener {
-            toggleFilterMenu(inflater)
+            toggleFilterMenu(LayoutInflater.from(requireContext()))
         }
-
-        return view
     }
 
     private fun loadSavedSongs() {
@@ -95,16 +101,12 @@ class LibraryFragment : Fragment() {
 
             filterMenuView.findViewById<View>(R.id.startDatePickerButton)
                 .setOnClickListener {
-                    showDateTimePicker { calendar ->
-                        startDateTime = calendar
-                    }
+                    showDateTimePicker { calendar -> startDateTime = calendar }
                 }
 
             filterMenuView.findViewById<View>(R.id.endDatePickerButton)
                 .setOnClickListener {
-                    showDateTimePicker { calendar ->
-                        endDateTime = calendar
-                    }
+                    showDateTimePicker { calendar -> endDateTime = calendar }
                 }
 
             filterMenuView.findViewById<View>(R.id.applyFilterButton)

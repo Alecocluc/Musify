@@ -28,5 +28,4 @@
     <string name="song_duration">%d segundos</string>
     <string name="menu_de_filtros">Menú de Filtros</string>
     <string name="fecha_de_inicio">Fecha de inicio:</string>
-    <string name="filtrar">Filtrar</string>
 </resources>
