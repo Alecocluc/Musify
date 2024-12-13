@@ -5,15 +5,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorPrimary"
-    android:padding="16dp"
-    android:theme="@style/Theme.Musify">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/startDateText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/fecha_de_inicio"
-        app:textColor="@color/colorOnPrimary"
+        android:textColor="@color/colorOnPrimary"
         android:textSize="14sp"
         android:layout_marginBottom="4dp"/>
 
