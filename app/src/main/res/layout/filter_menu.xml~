@@ -8,19 +8,6 @@
     android:padding="16dp"
     android:theme="@style/Theme.Musify">
 
-    <!-- Título del menú -->
-    <TextView
-        android:id="@+id/titleMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Menú de Filtros"
-        android:textColor="@color/colorOnPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"
-        android:layout_gravity="center_horizontal"/>
-
-    <!-- Texto para la fecha de inicio -->
     <TextView
         android:id="@+id/startDateText"
         android:layout_width="match_parent"
@@ -30,7 +17,6 @@
         android:textSize="14sp"
         android:layout_marginBottom="4dp"/>
 
-    <!-- Botón para seleccionar la fecha de inicio -->
     <Button
         android:id="@+id/startDatePickerButton"
         android:layout_width="match_parent"
@@ -42,7 +28,6 @@
         android:layout_marginBottom="8dp"
         android:padding="8dp"/>
 
-    <!-- Texto para la fecha de fin -->
     <TextView
         android:id="@+id/endDateText"
         android:layout_width="match_parent"
@@ -52,7 +37,6 @@
         android:textSize="14sp"
         android:layout_marginBottom="4dp"/>
 
-    <!-- Botón para seleccionar la fecha de fin -->
     <Button
         android:id="@+id/endDatePickerButton"
         android:layout_width="match_parent"
@@ -64,14 +48,12 @@
         android:layout_marginBottom="8dp"
         android:padding="8dp"/>
 
-    <!-- Contenedor para los botones de aplicar y borrar filtro -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center_horizontal">
 
-        <!-- Botón para aplicar el filtro -->
         <Button
             android:id="@+id/applyFilterButton"
             android:layout_width="0dp"
@@ -85,7 +67,6 @@
             android:layout_marginEnd="4dp"
             android:padding="8dp"/>
 
-        <!-- Botón para borrar el filtro -->
         <Button
             android:id="@+id/clearFilterButton"
             android:layout_width="0dp"

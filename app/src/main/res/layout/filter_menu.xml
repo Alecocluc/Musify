@@ -12,8 +12,8 @@
         android:id="@+id/startDateText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Fecha de inicio:"
-        android:textColor="@color/colorOnPrimary"
+        android:text="@string/fecha_de_inicio"
+        app:textColor="@color/colorOnPrimary"
         android:textSize="14sp"
         android:layout_marginBottom="4dp"/>
 
@@ -21,7 +21,7 @@
         android:id="@+id/startDatePickerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Seleccionar fecha de inicio"
+        android:text="@string/seleccionar_fecha_de_inicio"
         android:textColor="@color/colorOnPrimary"
         android:textSize="16sp"
         android:background="@drawable/card_background"
@@ -32,7 +32,7 @@
         android:id="@+id/endDateText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Fecha de fin:"
+        android:text="@string/fecha_de_fin"
         android:textColor="@color/colorOnPrimary"
         android:textSize="14sp"
         android:layout_marginBottom="4dp"/>
@@ -41,10 +41,10 @@
         android:id="@+id/endDatePickerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Seleccionar fecha de fin"
+        android:text="@string/seleccionar_fecha_de_fin"
         android:textColor="@color/colorOnPrimary"
         android:textSize="16sp"
-        android:background="@drawable/card_background"
+        app:background="@drawable/card_background"
         android:layout_marginBottom="8dp"
         android:padding="8dp"/>
 
@@ -59,11 +59,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Aplicar filtro"
+            android:text="@string/aplicar_filtro"
             android:textColor="@color/colorOnPrimary"
             android:textSize="16sp"
             android:background="@drawable/btn_settings"
-            android:backgroundTint="@color/colorAccent"
+            app:backgroundTint="@color/colorAccent"
             android:layout_marginEnd="4dp"
             android:padding="8dp"/>
 
@@ -72,11 +72,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Borrar filtro"
+            android:text="@string/borrar_filtro"
             android:textColor="@color/colorOnPrimary"
             android:textSize="16sp"
             android:background="@drawable/btn_settings"
-            android:backgroundTint="@color/colorAccent"
+            app:backgroundTint="@color/colorAccent"
             android:layout_marginStart="4dp"
             android:padding="8dp"/>
     </LinearLayout>
